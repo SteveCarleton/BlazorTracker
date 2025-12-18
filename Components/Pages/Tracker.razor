@@ -1,4 +1,8 @@
 ﻿@page "/tracker"
+@using System.Text.Json;
+@using System.Text.Json.Serialization;
+@using System.Threading.Tasks
+@inject IJSRuntime JS;
 
 <div class="d-flex-align-items-center">
     <div class="tracker p-5">
@@ -9,7 +13,7 @@
             <EditForm Model="ti" OnValidSubmit="addTask">
                 <DataAnnotationsValidator/>
                 <div class="d-flex flex-row gap-2">
-                    <InputText class="form-control" placeholder="Enter a task" @bind-Value="ti.Name"></InputText>
+                    <InputText @ref="textBoxTask" class="form-control" placeholder="Enter a task" @bind-Value="ti.Name"></InputText>
                     <button type="submit" class="btn btn-primary">Add</button>
                 </div>
                 <div>
@@ -22,7 +26,7 @@
             @foreach(var lineItem in trackerItems)
             {
                 @* <div>@lineItem.Name</div> *@
-                <TrackerLine Item="lineItem" OnDeleteCallback="deleteTask"></TrackerLine>
+                <TrackerLine Item="lineItem" OnDeleteCallback="deleteTask" OnCompleteCallback="updateTask"></TrackerLine>
             }
         </div>
     </div>
@@ -31,21 +35,57 @@
 @code {
     private TrackerItem ti = new();
     private List<TrackerItem> trackerItems = new();
+    private InputText? textBoxTask { get; set; }
 
-    private void addTask()
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadListAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await textBoxTask!.Element!.Value.FocusAsync();
+        }
+    }
+
+    private async Task addTask()
     {
         ti.Id = Guid.NewGuid();
         trackerItems.Add(ti);
         ti = new TrackerItem();
+        await SaveListAsync();
     }
 
     private async Task updateTask(TrackerItem item)
     {
-        // save item to local storage
+        await SaveListAsync();
     }
 
     private async Task deleteTask(TrackerItem item)
     {
         trackerItems.Remove(item);
+        await SaveListAsync();
+    }
+
+    private async Task SaveListAsync()
+    {
+        string? trackerItemsJson = JsonSerializer.Serialize(trackerItems);
+        await JS.InvokeVoidAsync("localStorage.setItem", "TaskerList", trackerItemsJson);
+    }
+
+    private async Task LoadListAsync()
+    {
+        try
+        {
+            string? trackerItemsJson = await JS.InvokeAsync<string>("localStorage.getItem", "TaskerList") ?? "{}";
+            trackerItems = JsonSerializer.Deserialize<List<TrackerItem>>(trackerItemsJson) ?? [];
+        }
+        catch(Exception _)
+        {
+            trackerItems = [];
+            await SaveListAsync();
+        }
     }
 }
