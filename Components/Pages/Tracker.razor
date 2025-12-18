@@ -1,0 +1,41 @@
+﻿@page "/tracker"
+
+<div class="d-flex-align-items-center">
+    <div class="tracker p-5">
+        <div class="p-2 text-center mb">
+            <img src="/img/icon-192.png" width="300" />
+        </div>
+        <div>
+            <EditForm Model="ti" OnValidSubmit="addTask">
+                <DataAnnotationsValidator/>
+                <div class="d-flex flex-row gap-2">
+                    <InputText class="form-control" placeholder="Enter a task" @bind-Value="ti.Name"></InputText>
+                    <button type="submit" class="btn btn-primary">Add</button>
+                </div>
+                <div>
+                    <ValidationMessage For="() => ti.Name"/>
+                </div>
+            </EditForm>
+        </div>
+        <hr/>
+        <div class="vstack">
+            @foreach(var lineItem in trackerItems)
+            {
+                @* <div>@lineItem.Name</div> *@
+                <TrackerLine Item="lineItem"></TrackerLine>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private TrackerItem ti = new();
+    private List<TrackerItem> trackerItems = new();
+
+    private void addTask()
+    {
+        ti.Id = Guid.NewGuid();
+        trackerItems.Add(ti);
+        ti = new TrackerItem();
+    }
+}
