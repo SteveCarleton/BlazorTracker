@@ -22,7 +22,7 @@
             @foreach(var lineItem in trackerItems)
             {
                 @* <div>@lineItem.Name</div> *@
-                <TrackerLine Item="lineItem"></TrackerLine>
+                <TrackerLine Item="lineItem" OnDeleteCallback="deleteTask"></TrackerLine>
             }
         </div>
     </div>
@@ -37,5 +37,15 @@
         ti.Id = Guid.NewGuid();
         trackerItems.Add(ti);
         ti = new TrackerItem();
+    }
+
+    private async Task updateTask(TrackerItem item)
+    {
+        // save item to local storage
+    }
+
+    private async Task deleteTask(TrackerItem item)
+    {
+        trackerItems.Remove(item);
     }
 }

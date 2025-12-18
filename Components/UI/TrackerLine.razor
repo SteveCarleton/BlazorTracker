@@ -1,8 +1,8 @@
 ﻿<div class="d-flex flex-row">
-    <div><InputCheckbox @bind-Value="Item.IsComplete"></InputCheckbox></div>
-    <div class="px-2 flex-grow-1">@Item.Name</div>
+    <div><InputCheckbox @bind-Value="Item.IsComplete" @bind-Value:after="updateItem"></InputCheckbox></div>
+    <div class="px-2 flex-grow-1 @(Item.IsComplete ? "complete" : "")">@Item.Name</div>
     @* <div><i class="bi bi-trash-fill text-danger"></i></div> *@
-    <div><button class="btn btn-primary">Delete</button></div>
+    <div><a @onclick="deleteItem">Delete</a></div>
 
 </div>
 
@@ -12,4 +12,20 @@
     /// </summary>
     [Parameter, EditorRequired]
     public TrackerItem? Item { get; set; }
+
+    [Parameter]
+    public EventCallback<TrackerItem> OnDeleteCallback { get; set; }
+
+    [Parameter]
+    public EventCallback<TrackerItem> OnCompleteCallback { get; set; }
+
+    private async Task updateItem()
+    {
+        await OnCompleteCallback.InvokeAsync(Item);
+    }
+
+    private async Task deleteItem()
+    {
+        await OnDeleteCallback.InvokeAsync(Item);
+    }
 }
