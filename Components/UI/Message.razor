@@ -1,0 +1,21 @@
+﻿<div class="alert @CssClass border border-1 border-dark">
+    @* Non-routeable component *@
+    <h4>@Title</h4>
+    <div>@DisplayMessage</div>
+</div>
+@code {
+    /// <summary>Message to display in the message box</summary>
+    /// <remarks>A warning is displayed if the parameter is missing</remarks>
+    [Parameter, EditorRequired]
+    public string DisplayMessage { get; set; } = "";
+
+    /// <summary>Title to display in the message box</summary>
+    [Parameter]
+    public string Title { get; set; } = "";
+
+    /// <summary>
+    /// The CSS class to apply to the message box. Defaults to alert-success. Use bootstrap alert colors.
+    /// </summary>
+    [Parameter]
+    public string CssClass { get; set; } = "alert-success";
+}
