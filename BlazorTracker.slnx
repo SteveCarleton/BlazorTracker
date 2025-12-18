@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="../BlazorLayout/BlazorLayout.csproj" Id="f5572c37-6e70-40e2-b5f0-093661335096" />
   <Project Path="BlazorTracker.csproj" />
 </Solution>
